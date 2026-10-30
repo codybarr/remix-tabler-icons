@@ -8,6 +8,8 @@ generated/
 # output
 out
 dist
+dist-website/
+.wrangler/
 *.tgz
 
 # code coverage

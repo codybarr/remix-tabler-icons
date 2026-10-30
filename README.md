@@ -155,6 +155,33 @@ After installing dependencies/generating icons, `bun run dev` and `bun run serve
 
 The website and development configs are not included in the npm tarball.
 
+## Deploy the website to Cloudflare Workers
+
+The npm library build (`bun run build`) is separate from the website build. Workers cannot run the Bun development server directly.
+
+In your Cloudflare Workers Git integration, use the repository root and set:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `bun run build:website` |
+| Deploy command | `bunx wrangler deploy` |
+| Preview/non-production deploy command (if enabled) | `bunx wrangler versions upload` |
+
+The Worker name in `wrangler.jsonc` must match the Worker you connected in the dashboard; change `name` if yours differs from `remix-tabler-icons`. No secrets or additional bindings need to be configured in the dashboard.
+
+The website build automatically runs icon generation on a clean checkout, bundles the frontend with Bun, and pre-renders SVGs into `dist-website/`. Wrangler uploads those static assets alongside a small search Worker. The icon manifest stays server-side; individual SVGs are served through the same `/api/icons/` URLs as local development. Unknown routes return 404, rather than an SPA fallback. The upstream license is included in the assets.
+
+Generation defaults to the latest Tabler release. For a reproducible deployment, use `bun run generate --version v3.50.0 && bun run build:website` as the build command, substituting your desired release. If GitHub API rate limits affect unpinned generation, an optional `GITHUB_TOKEN` build secret increases the limit; it is not needed by the deployed Worker.
+
+For local Workers testing or manual deployment:
+
+```sh
+bun run dev:worker                # build and start Wrangler's local Workers runtime
+bun run deploy                    # build and deploy (requires Cloudflare authentication)
+```
+
+`bun run dev` and the mise/Pitchfork workflow still use Bun and are unchanged. Website assets and Wrangler state are gitignored and excluded from the npm package.
+
 ## Validate
 
 ```sh
