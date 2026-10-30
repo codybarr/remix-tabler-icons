@@ -103,6 +103,16 @@ bun publish --access public
 
 `prepublishOnly` runs generator tests, package/tree-shaking checks, and type checking. `prepack` rebuilds the distribution. The dry run does not publish; the final command does. If npm requires two-factor authentication, follow its OTP instructions.
 
+### Automated upstream releases
+
+`.github/workflows/release.yml` checks the latest stable Tabler release every night at **03:23 UTC**, or manually via **Actions → Release updated Tabler icons → Run workflow**. Package versions match Tabler versions (for example, upstream `v3.50.0` publishes `3.50.0`). This intentionally moves automated releases from the initial `0.1.0` version to upstream versioning.
+
+npm publishing uses **trusted publishing (OIDC)**, not an `NPM_TOKEN` secret. In the npm package's trusted publisher settings, select GitHub Actions, owner **`codybarr`**, repository **`remix-tabler-icons`**, and workflow filename **`release.yml`** (not the workflow's display name or full path). Leave the environment unset unless you also configure a matching GitHub environment on the release job. The workflow grants `id-token: write` and uses Node 24 with npm CLI 11 for publishing; installation, generation, tests, builds, and packing still use Bun. Public packages from public repositories receive npm provenance automatically; `package.json` declares the matching source repository. GitHub releases use the built-in `GITHUB_TOKEN` with `contents: write`. Repository policy must allow these permissions.
+
+The workflow skips versions already on both npm and GitHub. Otherwise it generates the exact upstream tag, sets the package version in the build workspace, runs tests/package checks/type checking, and packs the release. It publishes to npm with the `latest` tag, then creates a matching GitHub release with `release.tgz` attached. Rerunning after a partial failure skips an already-published npm version and finishes the GitHub release. Network/authentication errors fail the check rather than being treated as missing releases.
+
+No version bump or generated files are committed back to the default branch. The GitHub tag points to the source commit used for the build; its attached tarball contains the release-specific package version and upstream manifest. Changes within an already-released upstream tag do not trigger another release.
+
 ## Local documentation website
 
 A native Remix 3.1 component application lives in `website/`. It imports UI icons directly from `generated/`, so no published package or React dependency is needed.

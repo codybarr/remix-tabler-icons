@@ -60,7 +60,7 @@ test("npm tarball contains compiled modules, declarations, provenance and licens
   expect(paths.some(path => /\.tsx$/.test(path))).toBe(false);
   const pkg = await files.get("package/package.json")!.json();
   expect(pkg.name).toBe("@nosweat/remix-tabler-icons");
-  expect(pkg.version).toBe("0.1.0");
+  expect(pkg.version).toBe((await Bun.file(resolve(root, "package.json")).json()).version);
   expect(pkg.publishConfig).toEqual({ access: "public", registry: "https://registry.npmjs.org/", tag: "latest" });
   expect(pkg.private).not.toBe(true);
   expect(pkg.sideEffects).toBe(false);

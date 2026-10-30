@@ -2,6 +2,10 @@
   "name": "@nosweat/remix-tabler-icons",
   "version": "0.1.0",
   "description": "Tree-shakable Tabler SVG icons for native Remix 3.1 components",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codybarr/remix-tabler-icons.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

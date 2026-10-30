@@ -1,0 +1,69 @@
+name: Release updated Tabler icons
+
+on:
+  schedule:
+    - cron: "23 3 * * *" # Nightly at 03:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tabler-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write # npm trusted publishing (OIDC)
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - name: Check upstream and existing publications
+        id: check
+        run: bun scripts/release.ts
+      - name: Set package version and generate pinned icons
+        if: steps.check.outputs.needed == 'true'
+        env:
+          VERSION: ${{ steps.check.outputs.version }}
+          TABLER_TAG: ${{ steps.check.outputs.tag }}
+        run: |
+          bun -e 'const p = await Bun.file("package.json").json(); p.version = process.env.VERSION; await Bun.write("package.json", JSON.stringify(p, null, 2) + "\n");'
+          bun run generate --version "$TABLER_TAG"
+      - name: Validate release
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          bun test
+          bun run test:package
+          bun check
+      - name: Pack release artifact
+        if: steps.check.outputs.needed == 'true'
+        run: bun pm pack --filename release.tgz
+      - name: Set up Node for npm trusted publishing
+        if: steps.check.outputs.npm_published == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Publish to npm via trusted publishing
+        if: steps.check.outputs.npm_published == 'false'
+        # npm >=11.5.1 supports OIDC; Bun still handles installation, builds and packing.
+        run: bunx npm@11 publish ./release.tgz --access public --tag latest
+      - name: Create GitHub release
+        if: steps.check.outputs.github_released == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TABLER_TAG: ${{ steps.check.outputs.tag }}
+          VERSION: ${{ steps.check.outputs.version }}
+        run: |
+          gh release create "$TABLER_TAG" release.tgz \
+            --target "$GITHUB_SHA" \
+            --title "$TABLER_TAG" \
+            --notes "Native Remix components generated from [Tabler Icons $TABLER_TAG](https://github.com/tabler/tabler-icons/releases/tag/$TABLER_TAG). Install with: bun add @nosweat/remix-tabler-icons@$VERSION"
