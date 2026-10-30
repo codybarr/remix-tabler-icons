@@ -1,0 +1,11 @@
+#:schema https://pitchfork.jdx.dev/schema.json
+
+# The directory-derived namespace keeps this checkout separate from other projects.
+[daemons.web]
+run = "exec bun --hot website/server.ts"
+mise = true
+port = 4310
+proxy = false
+# Use the assigned PORT at probe time (self ports are unavailable in templates).
+ready_cmd = '''bun -e 'try { const r = await fetch(`http://127.0.0.1:${process.env.PORT}/api/search?q=heart`); process.exit(r.ok ? 0 : 1); } catch { process.exit(1); }' '''
+env = { HOST = "127.0.0.1", NODE_ENV = "development" }

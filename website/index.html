@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f9f6" />
+    <meta name="description" content="Browse and search Tabler icons built for native Remix 3.1. Install @nosweat/remix-tabler-icons and copy ready-to-use components." />
+    <title>Tabler for Remix — @nosweat</title>
+    <script>
+      try {
+        const saved = localStorage.getItem("tabler-theme");
+        document.documentElement.dataset.theme = saved === "light" || saved === "dark" ? saved : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      } catch { document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;450;500;550;600;650;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>This icon explorer requires JavaScript. Install with: npm install @nosweat/remix-tabler-icons remix@^3.1.0</noscript>
+    <script type="module" src="./frontend.tsx"></script>
+  </body>
+</html>

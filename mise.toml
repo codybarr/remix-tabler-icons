@@ -1,0 +1,46 @@
+[tools]
+bun = "1.4.4"
+pitchfork = "2.32.1"
+
+[tasks.setup]
+description = "Install dependencies and generate icons if missing"
+run = [
+  "bun install --frozen-lockfile",
+  "test -f generated/manifest.json || bun run generate",
+]
+
+[tasks.dev]
+description = "Run the website in the foreground with hot reload"
+depends = ["setup"]
+run = "bun run dev"
+
+[tasks.serve]
+description = "Run the website in the foreground in production mode"
+depends = ["setup"]
+run = "bun run serve"
+
+[tasks.start]
+description = "Start the website detached under Pitchfork and wait for readiness"
+depends = ["setup"]
+run = "pitchfork start web"
+
+[tasks.stop]
+description = "Stop this project's website (not other Pitchfork services)"
+run = "pitchfork stop web"
+
+[tasks.restart]
+description = "Restart the managed website with current configuration"
+depends = ["setup"]
+run = "pitchfork restart web"
+
+[tasks.status]
+description = "Show the managed website's status"
+run = "pitchfork status web"
+
+[tasks.logs]
+description = "Follow website logs (Ctrl-C leaves the website running)"
+run = "pitchfork logs web --tail"
+
+[tasks.check]
+description = "Run tests, package/tree-shaking checks, and type checking"
+run = ["bun test", "bun run test:package", "bun check"]

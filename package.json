@@ -38,6 +38,13 @@
   },
   "scripts": {
     "generate": "bun scripts/generate.ts",
+    "dev": "bun --hot website/server.ts",
+    "start": "mise run start",
+    "stop": "mise run stop",
+    "restart": "mise run restart",
+    "status": "mise run status",
+    "logs": "mise run logs",
+    "serve": "NODE_ENV=production bun website/server.ts",
     "build": "bun scripts/build.ts",
     "prepack": "bun run build",
     "prepublishOnly": "bun test && bun run test:package && bun check",

@@ -103,6 +103,58 @@ bun publish --access public
 
 `prepublishOnly` runs generator tests, package/tree-shaking checks, and type checking. `prepack` rebuilds the distribution. The dry run does not publish; the final command does. If npm requires two-factor authentication, follow its OTP instructions.
 
+## Local documentation website
+
+A native Remix 3.1 component application lives in `website/`. It imports UI icons directly from `generated/`, so no published package or React dependency is needed.
+
+### Detached development with mise + Pitchfork
+
+Install [mise](https://mise.jdx.dev/getting-started.html), then run from the repository root:
+
+```sh
+mise trust
+mise install                     # pinned Bun 1.4.4 and Pitchfork 2.32.1
+mise run start                   # installs dependencies, generates missing icons, starts detached
+```
+
+Open **http://127.0.0.1:4310** for install instructions, npm/pnpm/Bun tabs, and copyable examples. `/icons` provides name search, outline/filled filters, pagination, and an accessible preview dialog with component/import snippets. Light/dark mode follows the system initially and remembers an explicit choice.
+
+The full searchable manifest stays on the server. Search is debounced and cancels obsolete requests; responses contain at most 72 records. Thumbnails load lazily from cached SVG endpoints rendered by the locally generated Remix components, rather than shipping thousands of icon modules to the browser. Search terms, style, and page are preserved in the URL.
+
+`mise.toml` pins the tools and defines tasks; `pitchfork.toml` defines the `web` daemon. Pitchfork runs Bun with hot reload and waits for a successful HTTP readiness probe before startup returns. Its supervisor keeps the website alive after the command exits or the terminal closes. Starting an already running website is a no-op. There is no login/boot autostart configured.
+
+| Operation | mise task | Bun script alias |
+| --- | --- | --- |
+| Start detached | `mise run start` | `bun run start` |
+| Stop | `mise run stop` | `bun run stop` |
+| Restart/apply config | `mise run restart` | `bun run restart` |
+| Show PID/status/port | `mise run status` | `bun run status` |
+| Follow logs | `mise run logs` | `bun run logs` |
+| Run validation | `mise run check` | — |
+
+Bun aliases require mise on `PATH`; they delegate to the same tasks. Stop targets only this project's `web` daemon, not other Pitchfork services. Ctrl-C while following logs stops the log viewer, **not** the website. For a finite log snapshot, use `mise exec -- pitchfork logs web -n 50 --no-pager`. Logs and process state are managed by Pitchfork outside this repository.
+
+The managed daemon binds to loopback on port 4310. Pitchfork checks that the port is free instead of killing another process or silently switching ports. For a personal override, create the gitignored `pitchfork.local.toml`:
+
+```toml
+[daemons.web]
+port = 4320
+```
+
+Then run `mise run restart`. The assigned port is passed to Bun as `PORT` and used by the readiness probe automatically. Managed ports are configured in Pitchfork, not by prefixing `PORT=...` to the start command. Local mise overrides belong in the gitignored `mise.local.toml`.
+
+### Foreground alternatives
+
+```sh
+mise run dev                     # foreground hot reload, default port 3000
+PORT=4320 mise run dev            # choose a foreground port
+mise run serve                   # foreground production mode, no hot reload
+```
+
+After installing dependencies/generating icons, `bun run dev` and `bun run serve` also work directly. `HOST` and `PORT` configure foreground servers. `bun run start` now means **detached development**; the previous foreground production command is `bun run serve`.
+
+The website and development configs are not included in the npm tarball.
+
 ## Validate
 
 ```sh
