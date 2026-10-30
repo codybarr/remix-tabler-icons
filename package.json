@@ -1,0 +1,57 @@
+{
+  "name": "@nosweat/remix-tabler-icons",
+  "version": "0.1.0",
+  "description": "Tree-shakable Tabler SVG icons for native Remix 3.1 components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "tag": "latest"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./outline": {
+      "types": "./dist/generated/outline/index.d.ts",
+      "import": "./dist/generated/outline/index.js"
+    },
+    "./filled": {
+      "types": "./dist/generated/filled/index.d.ts",
+      "import": "./dist/generated/filled/index.js"
+    },
+    "./outline/*": {
+      "types": "./dist/generated/outline/*.d.ts",
+      "import": "./dist/generated/outline/*.js"
+    },
+    "./filled/*": {
+      "types": "./dist/generated/filled/*.d.ts",
+      "import": "./dist/generated/filled/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "generate": "bun scripts/generate.ts",
+    "build": "bun scripts/build.ts",
+    "prepack": "bun run build",
+    "prepublishOnly": "bun test && bun run test:package && bun check",
+    "test": "bun test",
+    "test:package": "bun run build && bun test ./scripts/package.check.ts",
+    "typecheck": "bun check"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@xmldom/xmldom": "^0.9.12",
+    "remix": "3.1.0",
+    "typescript": "^7"
+  },
+  "peerDependencies": {
+    "remix": "^3.1.0"
+  }
+}
