@@ -13,9 +13,9 @@ export type SearchResults = {
 export const PAGE_SIZE = 72;
 export const packageName = "@nosweat/remix-tabler-icons";
 export const installCommands = {
-  npm: `npm install ${packageName} remix@^3.1.0`,
-  pnpm: `pnpm add ${packageName} remix@^3.1.0`,
-  bun: `bun add ${packageName} remix@^3.1.0`,
+  npm: `npm install ${packageName}`,
+  pnpm: `pnpm add ${packageName}`,
+  bun: `bun add ${packageName}`,
 };
 
 export function iconImport(icon: IconRecord) {

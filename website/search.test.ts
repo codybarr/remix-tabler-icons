@@ -43,7 +43,7 @@ test("usage snippets use scoped, individual imports and native Remix closures", 
   expect(iconImport(icon)).toContain('@nosweat/remix-tabler-icons/filled/IconHeartFilled');
   expect(iconExample(icon)).toContain("return () => (");
   expect(iconExample(icon)).toContain("<IconHeartFilled");
-  expect(installCommands.npm).toBe("npm install @nosweat/remix-tabler-icons remix@^3.1.0");
-  expect(installCommands.pnpm).toStartWith("pnpm add ");
-  expect(installCommands.bun).toStartWith("bun add ");
+  expect(installCommands.npm).toBe("npm install @nosweat/remix-tabler-icons");
+  expect(installCommands.pnpm).toBe("pnpm add @nosweat/remix-tabler-icons");
+  expect(installCommands.bun).toBe("bun add @nosweat/remix-tabler-icons");
 });
